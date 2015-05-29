@@ -1,6 +1,7 @@
 # RspecTimer
 
-TODO: Write a gem description
+RSpecTimer will track the amount of time each of your tests take to complete,
+and when it's done, can save the data to a YAML file.
 
 ## Installation
 
