@@ -42,7 +42,7 @@ RSpec.configure do |config|
 
   config.after(:suite) do
     # Output metrics after running the test suite
-    puts 'Metrics:"
+    puts 'Metrics:'
     puts RspecTimer.metrics.to_yaml.to_s
   
     # Stores any metrics from this test run into the YAML log file
