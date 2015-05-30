@@ -28,8 +28,11 @@ In your spec_helper.rb file, set up your "around" and "after" hooks like so:
 RSpec.configure do |config|
 
   config.before(:suite) do
+    # Set the log file's path (optional - if not set, defaults to a 'rspec-metrics.yml' file in your current folder)
+    RspecTimer.log_file_path = 'rspec_metrics.yml'
+  
     # Completely wipes any metrics from the log (optional)
-    RspecTimer.reset_metrics_log_file('rspec_metrics.yml')
+    RspecTimer.reset_metrics_log_file
   end
 
   config.around(:each) do |example|
@@ -40,7 +43,7 @@ RSpec.configure do |config|
     # Stores any metrics from this test run into the YAML log file
     # Adds/updates metrics according to unique signatures which are generated
     # using each individual test's line number and source code.
-    RspecTimer.update_metrics_log_file('rspec_metrics.yml')
+    RspecTimer.update_metrics_log_file
   end
 
 end

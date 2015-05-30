@@ -7,11 +7,11 @@ class RspecTimer
   include Singleton
   extend SingleForwardable
 
-  def_delegators :instance, :reset_metrics, :log_file, :start_measurement, :end_measurement, :metrics,
+  def_delegators :instance, :reset_metrics, :log_file_path, :start_measurement, :end_measurement, :metrics,
                  :run_and_measure, :reset_metrics_log_file, :update_metrics_log_file, :signature_for
 
   attr_reader :metrics
-  attr_accessor :log_file
+  attr_writer :log_file_path
 
   def initialize
     reset_metrics
@@ -19,6 +19,10 @@ class RspecTimer
 
   def reset_metrics
     @metrics = {}
+  end
+
+  def log_file_path
+    @log_file_path ||= 'rspec_metrics.yml'
   end
 
   def start_measurement(example)
@@ -41,18 +45,18 @@ class RspecTimer
     end_measurement(example)
   end
 
-  def reset_metrics_log_file(file_name = default_metrics_file_name)
-    File.write(file_name, YAML.dump({}))
+  def reset_metrics_log_file
+    File.write(log_file_path, YAML.dump({}))
   end
 
-  def update_metrics_log_file(file_name = default_metrics_file_name)
+  def update_metrics_log_file
     updated_metrics = {}
     # Load any existing metrics
-    updated_metrics = YAML.load_file(file_name) if File.exists? (file_name)
+    updated_metrics = YAML.load_file(log_file_path) if File.exists? (log_file_path)
     # Merge in the new metrics, updating any existing ones
     @metrics.keys.each { |key| updated_metrics[key] = @metrics[key] }
     # Save metrics to the YAML log file
-    File.write(file_name, YAML.dump(updated_metrics))
+    File.write(log_file_path, YAML.dump(updated_metrics))
   end
 
   def signature_for(example)
@@ -60,10 +64,6 @@ class RspecTimer
   end
 
   private
-
-  def default_metrics_file_name
-    'rspec_metrics.yml'
-  end
 
   def metrics_for(example)
     @metrics[signature_for(example)] ||= {
