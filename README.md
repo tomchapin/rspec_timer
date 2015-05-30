@@ -28,7 +28,8 @@ In your spec_helper.rb file, set up your "around" and "after" hooks like so:
 RSpec.configure do |config|
 
   config.before(:suite) do
-    # Set the log file's path (optional - if not set, defaults to a 'rspec-metrics.yml' file in your current folder)
+    # Set the log file's path (optional - if not set, defaults
+    # to a 'rspec-metrics.yml' file in your current folder)
     RspecTimer.log_file_path = 'rspec_metrics.yml'
   
     # Completely wipes any metrics from the log (optional)
