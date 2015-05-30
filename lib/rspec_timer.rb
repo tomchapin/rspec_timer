@@ -8,10 +8,10 @@ class RspecTimer
   extend SingleForwardable
 
   def_delegators :instance, :reset_metrics, :log_file_path, :log_file_path=, :start_measurement, :end_measurement,
-                 :metrics, :run_and_measure, :reset_metrics_log_file, :update_metrics_log_file, :signature_for
+                 :metrics, :run_and_measure, :wipe_stored_metrics, :save_metrics, :signature_for
 
   attr_reader :metrics
-  attr_writer :log_file_path
+  attr_accessor :log_file_path
 
   def initialize
     reset_metrics
@@ -42,11 +42,11 @@ class RspecTimer
     end_measurement(example)
   end
 
-  def reset_metrics_log_file
+  def wipe_stored_metrics
     File.write(log_file_path, YAML.dump({}))
   end
 
-  def update_metrics_log_file
+  def save_metrics
     updated_metrics = {}
     # Load any existing metrics
     updated_metrics = YAML.load_file(log_file_path) if File.exists? (log_file_path)

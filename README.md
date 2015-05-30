@@ -32,7 +32,7 @@ RSpec.configure do |config|
     RspecTimer.log_file_path = 'rspec_metrics.yml'
   
     # Completely wipes any metrics from the log (optional)
-    RspecTimer.reset_metrics_log_file
+    RspecTimer.wipe_stored_metrics
   end
 
   config.around(:each) do |example|
@@ -40,10 +40,14 @@ RSpec.configure do |config|
   end
 
   config.after(:suite) do
+    # Output metrics after running the test suite
+    puts 'Metrics:"
+    puts RspecTimer.metrics.to_yaml.to_s
+  
     # Stores any metrics from this test run into the YAML log file
     # Adds/updates metrics according to unique signatures which are generated
     # using each individual test's line number and source code.
-    RspecTimer.update_metrics_log_file
+    RspecTimer.save_metrics
   end
 
 end
