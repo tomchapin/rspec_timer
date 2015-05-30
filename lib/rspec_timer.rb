@@ -7,9 +7,11 @@ class RspecTimer
   include Singleton
   extend SingleForwardable
 
-  def_delegators :instance, :reset_metrics, :start_measurement, :end_measurement, :metrics, :run_and_measure, :save_metrics_to_file
+  def_delegators :instance, :reset_metrics, :log_file, :start_measurement, :end_measurement, :metrics,
+                 :run_and_measure, :reset_metrics_log_file, :update_metrics_log_file, :signature_for
 
   attr_reader :metrics
+  attr_accessor :log_file
 
   def initialize
     reset_metrics
@@ -21,7 +23,7 @@ class RspecTimer
 
   def start_measurement(example)
     current_metrics              = metrics_for(example)
-    current_metrics[:signature]  = signature_for(example)
+    current_metrics[:path]       = example_path(example)
     current_metrics[:start_time] = Time.now
     example
   end
@@ -39,23 +41,37 @@ class RspecTimer
     end_measurement(example)
   end
 
-  def save_metrics_to_file(file_name)
-    File.write(file_name, YAML.dump(@metrics))
+  def reset_metrics_log_file(file_name = default_metrics_file_name)
+    File.write(file_name, YAML.dump({}))
+  end
+
+  def update_metrics_log_file(file_name = default_metrics_file_name)
+    updated_metrics = {}
+    # Load any existing metrics
+    updated_metrics = YAML.load_file(file_name) if File.exists? (file_name)
+    # Merge in the new metrics, updating any existing ones
+    @metrics.keys.each { |key| updated_metrics[key] = @metrics[key] }
+    # Save metrics to the YAML log file
+    File.write(file_name, YAML.dump(updated_metrics))
+  end
+
+  def signature_for(example)
+    Digest::MD5.hexdigest("#{example_path(example)}:#{example.example.instance_variable_get(:@example_block).source.to_s}")
   end
 
   private
 
-  def metrics_for(example)
-    @metrics[example_path(example)] ||= {
-        start_time: nil,
-        end_time:   nil,
-        total_time: nil,
-        signature:  nil
-    }
+  def default_metrics_file_name
+    'rspec_metrics.yml'
   end
 
-  def signature_for(example)
-    Digest::MD5.hexdigest(example.example.instance_variable_get(:@example_block).source.to_s)
+  def metrics_for(example)
+    @metrics[signature_for(example)] ||= {
+        path:       nil,
+        start_time: nil,
+        end_time:   nil,
+        total_time: nil
+    }
   end
 
   def example_path(example)
