@@ -7,22 +7,19 @@ class RspecTimer
   include Singleton
   extend SingleForwardable
 
-  def_delegators :instance, :reset_metrics, :log_file_path, :start_measurement, :end_measurement, :metrics,
-                 :run_and_measure, :reset_metrics_log_file, :update_metrics_log_file, :signature_for
+  def_delegators :instance, :reset_metrics, :log_file_path, :log_file_path=, :start_measurement, :end_measurement,
+                 :metrics, :run_and_measure, :reset_metrics_log_file, :update_metrics_log_file, :signature_for
 
   attr_reader :metrics
   attr_writer :log_file_path
 
   def initialize
     reset_metrics
+    @log_file_path ||= 'rspec_metrics.yml'
   end
 
   def reset_metrics
     @metrics = {}
-  end
-
-  def log_file_path
-    @log_file_path ||= 'rspec_metrics.yml'
   end
 
   def start_measurement(example)
