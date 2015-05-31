@@ -1,5 +1,7 @@
 # RspecTimer
 
+[![Gem Version](https://badge.fury.io/rb/rspec_timer.svg)](http://badge.fury.io/rb/rspec_timer)
+
 RSpecTimer will track the amount of time each of your tests take to complete,
 and when it's done, can save the data to a YAML file.
 
