@@ -47,9 +47,8 @@ class RspecTimer
   end
 
   def save_metrics
-    updated_metrics = {}
     # Load any existing metrics
-    updated_metrics = YAML.load_file(log_file_path) if File.exists? (log_file_path)
+    updated_metrics = (YAML.load_file(log_file_path) if File.exists? (log_file_path)) || {}
     # Merge in the new metrics, updating any existing ones
     @metrics.keys.each { |key| updated_metrics[key] = @metrics[key] }
     # Save metrics to the YAML log file
